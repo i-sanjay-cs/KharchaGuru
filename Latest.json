@@ -1,0 +1,768 @@
+{
+  "name": "Latest",
+  "nodes": [
+    {
+      "parameters": {
+        "model": "gpt-oss:20b",
+        "options": {}
+      },
+      "type": "@n8n/n8n-nodes-langchain.lmChatOllama",
+      "typeVersion": 1,
+      "position": [
+        96,
+        528
+      ],
+      "id": "c77943be-e51d-469e-83ab-fd365c022823",
+      "name": "Ollama Chat Model",
+      "credentials": {
+        "ollamaApi": {
+          "id": "1IoibZlQKMiQp78H",
+          "name": "Ollama gptoss"
+        }
+      }
+    },
+    {
+      "parameters": {
+        "descriptionType": "manual",
+        "toolDescription": "=  Create a new entry in Expense Tracker",
+        "operation": "create",
+        "base": {
+          "__rl": true,
+          "value": "app1UBWQo6PP9fAUp",
+          "mode": "list",
+          "cachedResultName": "ExpenseTracker",
+          "cachedResultUrl": "https://airtable.com/app1UBWQo6PP9fAUp"
+        },
+        "table": {
+          "__rl": true,
+          "value": "tblRoC9bjEvMoxlKQ",
+          "mode": "list",
+          "cachedResultName": "Table 1",
+          "cachedResultUrl": "https://airtable.com/app1UBWQo6PP9fAUp/tblRoC9bjEvMoxlKQ"
+        },
+        "columns": {
+          "mappingMode": "defineBelow",
+          "value": {
+            "Amount": "={{ /*n8n-auto-generated-fromAI-override*/ $fromAI('Amount', ``, 'number') }}",
+            "Details": "={{ /*n8n-auto-generated-fromAI-override*/ $fromAI('Details', ``, 'string') }}",
+            "Category": "={{ /*n8n-auto-generated-fromAI-override*/ $fromAI('Category', ``, 'string') }}",
+            "Date": "={{ /*n8n-auto-generated-fromAI-override*/ $fromAI('Date', ``, 'string') }}"
+          },
+          "matchingColumns": [],
+          "schema": [
+            {
+              "id": "Details",
+              "displayName": "Details",
+              "required": false,
+              "defaultMatch": false,
+              "canBeUsedToMatch": true,
+              "display": true,
+              "type": "string",
+              "readOnly": false,
+              "removed": false
+            },
+            {
+              "id": "Amount",
+              "displayName": "Amount",
+              "required": false,
+              "defaultMatch": false,
+              "canBeUsedToMatch": true,
+              "display": true,
+              "type": "number",
+              "readOnly": false,
+              "removed": false
+            },
+            {
+              "id": "Category",
+              "displayName": "Category",
+              "required": false,
+              "defaultMatch": false,
+              "canBeUsedToMatch": true,
+              "display": true,
+              "type": "string",
+              "readOnly": false,
+              "removed": false
+            },
+            {
+              "id": "Date",
+              "displayName": "Date",
+              "required": false,
+              "defaultMatch": false,
+              "canBeUsedToMatch": true,
+              "display": true,
+              "type": "dateTime",
+              "readOnly": false,
+              "removed": false
+            }
+          ],
+          "attemptToConvertTypes": false,
+          "convertFieldsToString": false
+        },
+        "options": {}
+      },
+      "type": "n8n-nodes-base.airtableTool",
+      "typeVersion": 2.1,
+      "position": [
+        896,
+        352
+      ],
+      "id": "e6b4d4e1-0976-449b-9ba6-26eddc9eacea",
+      "name": "Create a record in Airtable",
+      "credentials": {
+        "airtableTokenApi": {
+          "id": "aGLfOPfo0lWqChsS",
+          "name": "Airtable Personal Access Token account"
+        }
+      }
+    },
+    {
+      "parameters": {
+        "descriptionType": "manual",
+        "toolDescription": "Retrieve expenses from database",
+        "operation": "search",
+        "base": {
+          "__rl": true,
+          "value": "app1UBWQo6PP9fAUp",
+          "mode": "list",
+          "cachedResultName": "ExpenseTracker",
+          "cachedResultUrl": "https://airtable.com/app1UBWQo6PP9fAUp"
+        },
+        "table": {
+          "__rl": true,
+          "value": "tblRoC9bjEvMoxlKQ",
+          "mode": "list",
+          "cachedResultName": "Table 1",
+          "cachedResultUrl": "https://airtable.com/app1UBWQo6PP9fAUp/tblRoC9bjEvMoxlKQ"
+        },
+        "options": {}
+      },
+      "type": "n8n-nodes-base.airtableTool",
+      "typeVersion": 2.1,
+      "position": [
+        1056,
+        240
+      ],
+      "id": "76b91c66-d4f8-4105-a686-cf2f4538b336",
+      "name": "Search records in Airtable",
+      "rewireOutputLogTo": "ai_tool",
+      "credentials": {
+        "airtableTokenApi": {
+          "id": "aGLfOPfo0lWqChsS",
+          "name": "Airtable Personal Access Token account"
+        }
+      }
+    },
+    {
+      "parameters": {
+        "promptType": "define",
+        "text": "={{ $json.message.text }} || {{ $json.content.parts[0].text }}",
+        "options": {
+          "systemMessage": "You are Kharcha Guru — an expert agent for expense tracking, financial coaching, spending insights, and government-scheme mapping.\nYou respond in a warm, polite, hospitality-style tone.\n\nGreeting Rule:\nAt the start of every response, greet the user with a friendly line like:\n\"Hello! I’m Kharcha Guru. How can I help you today?\"\n\nCore Behavior:\n\n1. Detect Intent (Expense Logging)\nIf user input is a new expense entry, extract amount, category (entertainment, food, eating out, travel, health, personal), and convert date to an ISO-8601 datetime object.\nFor scanned invoices, auto-detect amount + date.\nCreate the entry and confirm only the latest successful entry.\n\n2. Inquiry Mode (Reporting)\nIf it’s a question about past spending, use search entries.\nWhen asked for all expenses or recent expenses, return:\n• The list of entries formatted clearly.\n• The total amount summed.\n\n3. Financial Coaching Mode (Advice)\nAnalyze spending patterns & income.\nSuggest saving strategies, discounts, and discipline habits.\nSuggest government schemes mapped to spending sectors (health → Ayushman, skills → PMKVY, travel → LTA, low income → subsidies/welfare, etc.).\nAlso you can search for any schemes related to investments and buying like house schemes like Cidco.\n\n4. Search & Discovery Mode\nWhenever the user asks for government schemes, coupons, offers, benefits, or savings opportunities:\n• Use the priority search tool to find and match relevant schemes/perks based on the user’s spending.\n\nOutput Rules (CRITICAL FOR TELEGRAM):\n- You must output the response in HTML format.\n- Use <b>text</b> for bolding.\n- Use <i>text</i> for italics.\n- IMPORTANT: Do NOT use <br> tags. To make a new line, just use a regular line break (newline).\n- Do NOT use Markdown syntax (like **text** or *text*).\n- Do NOT use backticks (`).\n- Standard punctuation (!, ., -) is allowed and does not need escaping.\n\nResponse Constraint:\nEvery reply must be under 200 tokens.\n\nCurrent datetime: {{ $now }}",
+          "enableStreaming": true
+        }
+      },
+      "type": "@n8n/n8n-nodes-langchain.agent",
+      "typeVersion": 3,
+      "position": [
+        480,
+        -48
+      ],
+      "id": "b4b1a0cc-52c7-4f05-bf79-060de20d7898",
+      "name": "AI Agent1"
+    },
+    {
+      "parameters": {
+        "model": "Test-n8n",
+        "options": {}
+      },
+      "type": "@n8n/n8n-nodes-langchain.lmChatAzureOpenAi",
+      "typeVersion": 1,
+      "position": [
+        -192,
+        208
+      ],
+      "id": "dfbad905-55c7-4803-8644-62a9b94dc504",
+      "name": "Azure OpenAI Chat Model1",
+      "credentials": {
+        "azureOpenAiApi": {
+          "id": "tjeuYNd7C62mKdcH",
+          "name": "Azure Open AI account"
+        }
+      }
+    },
+    {
+      "parameters": {
+        "sessionIdType": "customKey",
+        "sessionKey": "={{ $json.message.chat.id }}"
+      },
+      "type": "@n8n/n8n-nodes-langchain.memoryBufferWindow",
+      "typeVersion": 1.3,
+      "position": [
+        -32,
+        432
+      ],
+      "id": "115d78e1-84ce-496d-a7f0-b3e7f6e660f1",
+      "name": "Simple Memory1"
+    },
+    {
+      "parameters": {
+        "updates": [
+          "message"
+        ],
+        "additionalFields": {}
+      },
+      "type": "n8n-nodes-base.telegramTrigger",
+      "typeVersion": 1.2,
+      "position": [
+        -112,
+        0
+      ],
+      "id": "8b02af8f-3772-4081-b984-a958121b1083",
+      "name": "Telegram Trigger",
+      "webhookId": "b2892065-3abd-4d3d-848e-e33c37d75354",
+      "credentials": {
+        "telegramApi": {
+          "id": "tQPv4kfZOSi5Qviu",
+          "name": "Telegram account 2"
+        }
+      }
+    },
+    {
+      "parameters": {
+        "rules": {
+          "values": [
+            {
+              "conditions": {
+                "options": {
+                  "caseSensitive": true,
+                  "leftValue": "",
+                  "typeValidation": "strict",
+                  "version": 2
+                },
+                "conditions": [
+                  {
+                    "leftValue": "={{ $json.message.text }}",
+                    "rightValue": "",
+                    "operator": {
+                      "type": "string",
+                      "operation": "exists",
+                      "singleValue": true
+                    },
+                    "id": "ef164d65-a608-413d-852d-86d6be5a8bf8"
+                  }
+                ],
+                "combinator": "and"
+              }
+            },
+            {
+              "conditions": {
+                "options": {
+                  "caseSensitive": true,
+                  "leftValue": "",
+                  "typeValidation": "strict",
+                  "version": 2
+                },
+                "conditions": [
+                  {
+                    "id": "836b80f5-831c-4dca-ac2a-f6a01afed9be",
+                    "leftValue": "={{ $json.message.voice }}",
+                    "rightValue": "",
+                    "operator": {
+                      "type": "object",
+                      "operation": "exists",
+                      "singleValue": true
+                    }
+                  }
+                ],
+                "combinator": "and"
+              }
+            },
+            {
+              "conditions": {
+                "options": {
+                  "caseSensitive": true,
+                  "leftValue": "",
+                  "typeValidation": "strict",
+                  "version": 2
+                },
+                "conditions": [
+                  {
+                    "id": "99a17a54-e8a7-4e14-8d5c-b06d44236faa",
+                    "leftValue": "={{ $json.message.document.mime_type }}",
+                    "rightValue": "",
+                    "operator": {
+                      "type": "string",
+                      "operation": "exists",
+                      "singleValue": true
+                    }
+                  }
+                ],
+                "combinator": "and"
+              }
+            }
+          ]
+        },
+        "options": {}
+      },
+      "type": "n8n-nodes-base.switch",
+      "typeVersion": 3.3,
+      "position": [
+        96,
+        0
+      ],
+      "id": "a02acadc-498e-4b65-9414-3c437d6615da",
+      "name": "Switch"
+    },
+    {
+      "parameters": {
+        "resource": "file",
+        "fileId": "={{ $json.message.voice.file_id }}",
+        "additionalFields": {}
+      },
+      "type": "n8n-nodes-base.telegram",
+      "typeVersion": 1.2,
+      "position": [
+        256,
+        80
+      ],
+      "id": "d6527612-81b1-456c-8471-d4b2d2a28ec7",
+      "name": "Get a file",
+      "webhookId": "c3ebf95f-85fc-49bf-87ec-0e7f9363d36f",
+      "credentials": {
+        "telegramApi": {
+          "id": "tQPv4kfZOSi5Qviu",
+          "name": "Telegram account 2"
+        }
+      }
+    },
+    {
+      "parameters": {
+        "options": {}
+      },
+      "type": "@n8n/n8n-nodes-langchain.lmChatOllama",
+      "typeVersion": 1,
+      "position": [
+        -48,
+        240
+      ],
+      "id": "540ac0c7-d173-40e1-94f5-cd2b3d2309d1",
+      "name": "Ollama Chat Model1",
+      "credentials": {
+        "ollamaApi": {
+          "id": "1IoibZlQKMiQp78H",
+          "name": "Ollama gptoss"
+        }
+      }
+    },
+    {
+      "parameters": {
+        "chatId": "={{ $('Telegram Trigger').item.json.message.from.id }}",
+        "text": "={{ $json.output }} || {{ $json.cleaned_message }}\n",
+        "additionalFields": {
+          "appendAttribution": false,
+          "parse_mode": "HTML"
+        }
+      },
+      "type": "n8n-nodes-base.telegram",
+      "typeVersion": 1.2,
+      "position": [
+        992,
+        -144
+      ],
+      "id": "5bfafe0a-7025-48f9-8da2-0d462c6377e5",
+      "name": "Send a text message",
+      "webhookId": "690bb20c-5089-4a97-af91-1c4c775a1614",
+      "credentials": {
+        "telegramApi": {
+          "id": "tQPv4kfZOSi5Qviu",
+          "name": "Telegram account 2"
+        }
+      }
+    },
+    {
+      "parameters": {
+        "options": {}
+      },
+      "type": "@n8n/n8n-nodes-langchain.lmChatGoogleGemini",
+      "typeVersion": 1,
+      "position": [
+        624,
+        192
+      ],
+      "id": "f78ca7bd-c186-4e13-9324-44e2c221507a",
+      "name": "Google Gemini Chat Model",
+      "credentials": {
+        "googlePalmApi": {
+          "id": "d40e0NF5rO4Jy0Gu",
+          "name": "Google Gemini(PaLM) Api account"
+        }
+      }
+    },
+    {
+      "parameters": {
+        "messages": {
+          "message": [
+            {
+              "content": "={{ $('Telegram Trigger').item.json.message.text }}",
+              "role": "system"
+            },
+            {
+              "content": "={{ /*n8n-auto-generated-fromAI-override*/ $fromAI('message1_Text', ``, 'string') }}"
+            }
+          ]
+        },
+        "options": {},
+        "requestOptions": {}
+      },
+      "type": "n8n-nodes-base.perplexityTool",
+      "typeVersion": 1,
+      "position": [
+        784,
+        384
+      ],
+      "id": "4c5a26e0-c89e-49a3-994c-c2039ff52360",
+      "name": "Message a model in Perplexity",
+      "credentials": {
+        "perplexityApi": {
+          "id": "PLK1TmuPvx9Kg15P",
+          "name": "Perplexity account"
+        }
+      }
+    },
+    {
+      "parameters": {
+        "resource": "file",
+        "fileId": "={{ $json.message.document.file_id }}",
+        "additionalFields": {}
+      },
+      "type": "n8n-nodes-base.telegram",
+      "typeVersion": 1.2,
+      "position": [
+        192,
+        240
+      ],
+      "id": "5ee2bcaa-f9ba-425a-b675-ef3be6785f67",
+      "name": "Get a file1",
+      "webhookId": "c3ebf95f-85fc-49bf-87ec-0e7f9363d36f",
+      "credentials": {
+        "telegramApi": {
+          "id": "tQPv4kfZOSi5Qviu",
+          "name": "Telegram account 2"
+        }
+      }
+    },
+    {
+      "parameters": {
+        "options": {}
+      },
+      "type": "@n8n/n8n-nodes-langchain.lmChatGoogleGemini",
+      "typeVersion": 1,
+      "position": [
+        -176,
+        400
+      ],
+      "id": "229f0bb3-0045-4e5c-bf21-0829478e8b81",
+      "name": "Google Gemini Chat Model1",
+      "credentials": {
+        "googlePalmApi": {
+          "id": "d40e0NF5rO4Jy0Gu",
+          "name": "Google Gemini(PaLM) Api account"
+        }
+      }
+    },
+    {
+      "parameters": {
+        "resource": "document",
+        "modelId": {
+          "__rl": true,
+          "value": "models/gemini-2.5-flash",
+          "mode": "list",
+          "cachedResultName": "models/gemini-2.5-flash"
+        },
+        "text": "You are an expert Financial Data Analyst. Analyze the attached financial statement image/document.\n\nYour goal is to extract structured data and provide a financial health summary.\n\nPlease output a single JSON object with exactly two keys: \"transactions\" and \"analysis\".\n\n1. \"transactions\": An array of objects, where each transaction in the document is a row. Extract:\n   - \"date\": Convert to ISO-8601 format (YYYY-MM-DD).\n   - \"details\": The description of the transaction (merchant name, etc.).\n   - \"amount\": The numeric value (remove currency symbols).\n   - \"category\": Assign one of these tags based on context: [Food, Travel, Entertainment, Utilities, Shopping, Health, Investment, Miscellaneous].\n\n2. \"analysis\": A text summary (formatted in HTML) that addresses:\n   - High Spending Areas: Identify which category has the highest volume.\n   - Outliers: Flag any unusually large single transactions.\n   - Recommendations: Suggest 1 concrete way to save money based on these specific purchases.\n   - Government Schemes: If you see expenses like Health or Education, mention a relevant Indian government scheme (e.g., Ayushman Bharat, Sukanya Samriddhi).\n\nIMPORTANT constraint: Output ONLY raw JSON. Do not use Markdown formatting (like ```json). Just the raw JSON string.",
+        "inputType": "binary",
+        "options": {}
+      },
+      "type": "@n8n/n8n-nodes-langchain.googleGemini",
+      "typeVersion": 1,
+      "position": [
+        368,
+        224
+      ],
+      "id": "1999ac5d-603b-4739-9e35-2febf455649d",
+      "name": "Analyze document",
+      "credentials": {
+        "googlePalmApi": {
+          "id": "d40e0NF5rO4Jy0Gu",
+          "name": "Google Gemini(PaLM) Api account"
+        }
+      }
+    },
+    {
+      "parameters": {},
+      "type": "@n8n/n8n-nodes-langchain.memoryRedisChat",
+      "typeVersion": 1.5,
+      "position": [
+        528,
+        496
+      ],
+      "id": "da49a06f-9781-44d0-a3dd-61bb99be4e72",
+      "name": "Redis Chat Memory",
+      "credentials": {
+        "redis": {
+          "id": "wiH0fZAfUzAu1QbZ",
+          "name": "Redis account"
+        }
+      }
+    },
+    {
+      "parameters": {
+        "jsCode": "// Get the text coming from the previous node (e.g., AI Agent or Gemini)\n// CHANGE 'output' to the actual name of the field coming from your AI\nconst rawText = $input.first().json.output;\n\n// 1. Replace <br> tags with real newlines (Fixes your specific error)\nlet cleanText = rawText.replace(/<br\\s*\\/?>/gi, '\\n');\n\n// 2. Remove <html>, <head>, <body> tags if the AI accidentally added them\ncleanText = cleanText.replace(/<\\/?(html|head|body|div|span)[^>]*>/gi, '');\n\n// 3. Ensure bold/italics are correct (Telegram only allows <b> <i> <u> <s> <a> <code> <pre>)\n// This part is optional but good for safety. \n// It keeps the text mostly as is but fixes the specific newline issue.\n\nreturn {\n  json: {\n    cleaned_message: cleanText\n  }\n};"
+      },
+      "type": "n8n-nodes-base.code",
+      "typeVersion": 2,
+      "position": [
+        816,
+        -64
+      ],
+      "id": "f39bbf74-1167-4c46-9070-3436e383d3d4",
+      "name": "Code in JavaScript"
+    },
+    {
+      "parameters": {},
+      "type": "n8n-nodes-base.manualTrigger",
+      "typeVersion": 1,
+      "position": [
+        304,
+        912
+      ],
+      "id": "2a0ceff3-aa66-459d-8a44-83864d042028",
+      "name": "When clicking ‘Execute workflow’"
+    },
+    {
+      "parameters": {
+        "chatId": "={{ $('Telegram Trigger').item.json.message.from.id }}",
+        "text": "=Hello! I’m Kharcha Guru. How can I help you today?\n\nI’ve analyzed your transaction history, and my system has flagged two major \"Wallet Leaks\" in your monthly statement: <b>Online Food Delivery</b> and <b>Daily Commute</b>.\n\nHere is how you can optimize this spending without compromising on your lifestyle:\n\n1. <b>The Zomato Hack:</b> You are paying too much in delivery and surge fees.\n• <b>Action:</b> Before paying, always check for credit card offers (like HDFC Swiggy/Axis).\n• <b>Suggestion:</b> Try codes like <b>ZOMATO50</b> or <b>TASTY</b>. If you order more than 3 times a month, buy <b>Zomato Gold</b> immediately. It pays for itself in just two orders.\n\n2. <b>Uber Strategy:</b> My data shows high ride frequency. Paying per ride is inefficient for you.\n• <b>Recommendation:</b> Switch to an <b>Uber One</b> subscription today. It waives the delivery fee on food <i>and</i> gives you 5-10% off rides.\n• <b>Alternative:</b> For shorter distances, consider switching your preference to Uber Auto or Shuttle to cut costs by 40%.\n\nShall I set a budget limit for these categories for next month?",
+        "additionalFields": {
+          "parse_mode": "HTML"
+        }
+      },
+      "type": "n8n-nodes-base.telegram",
+      "typeVersion": 1.2,
+      "position": [
+        784,
+        912
+      ],
+      "id": "ee335a5d-d394-4e5f-82fb-9051e2c2ca57",
+      "name": "Send a text message1",
+      "webhookId": "690bb20c-5089-4a97-af91-1c4c775a1614",
+      "credentials": {
+        "telegramApi": {
+          "id": "tQPv4kfZOSi5Qviu",
+          "name": "Telegram account 2"
+        }
+      }
+    },
+    {
+      "parameters": {
+        "resource": "chat",
+        "chatId": "`"
+      },
+      "type": "n8n-nodes-base.telegram",
+      "typeVersion": 1.2,
+      "position": [
+        512,
+        912
+      ],
+      "id": "120fe09a-98c2-44ce-85e7-b5b7a1b28508",
+      "name": "Get a chat",
+      "webhookId": "ac7272e8-94f0-4b06-944b-503d1056bb77",
+      "credentials": {
+        "telegramApi": {
+          "id": "tQPv4kfZOSi5Qviu",
+          "name": "Telegram account 2"
+        }
+      }
+    }
+  ],
+  "pinData": {},
+  "connections": {
+    "Ollama Chat Model": {
+      "ai_languageModel": [
+        []
+      ]
+    },
+    "Create a record in Airtable": {
+      "ai_tool": [
+        [
+          {
+            "node": "AI Agent1",
+            "type": "ai_tool",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Search records in Airtable": {
+      "ai_tool": [
+        [
+          {
+            "node": "AI Agent1",
+            "type": "ai_tool",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "AI Agent1": {
+      "main": [
+        [
+          {
+            "node": "Code in JavaScript",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Simple Memory1": {
+      "ai_memory": [
+        []
+      ]
+    },
+    "Telegram Trigger": {
+      "main": [
+        [
+          {
+            "node": "Switch",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Switch": {
+      "main": [
+        [
+          {
+            "node": "AI Agent1",
+            "type": "main",
+            "index": 0
+          }
+        ],
+        [
+          {
+            "node": "Get a file",
+            "type": "main",
+            "index": 0
+          }
+        ],
+        [
+          {
+            "node": "Get a file1",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Get a file": {
+      "main": [
+        []
+      ]
+    },
+    "Google Gemini Chat Model": {
+      "ai_languageModel": [
+        [
+          {
+            "node": "AI Agent1",
+            "type": "ai_languageModel",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Message a model in Perplexity": {
+      "ai_tool": [
+        [
+          {
+            "node": "AI Agent1",
+            "type": "ai_tool",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Get a file1": {
+      "main": [
+        [
+          {
+            "node": "Analyze document",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Analyze document": {
+      "main": [
+        [
+          {
+            "node": "AI Agent1",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Redis Chat Memory": {
+      "ai_memory": [
+        []
+      ]
+    },
+    "Code in JavaScript": {
+      "main": [
+        [
+          {
+            "node": "Send a text message",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "When clicking ‘Execute workflow’": {
+      "main": [
+        [
+          {
+            "node": "Get a chat",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Get a chat": {
+      "main": [
+        [
+          {
+            "node": "Send a text message1",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    }
+  },
+  "active": false,
+  "settings": {
+    "executionOrder": "v1"
+  },
+  "versionId": "48ba33d5-16de-4bb0-bb30-a7ad860a27fd",
+  "meta": {
+    "templateCredsSetupCompleted": true,
+    "instanceId": "806f87c00822b522d70de44e8a5581d8ab684b419f48a8edfdb65549bde66fd2"
+  },
+  "id": "iKKEVuTyIp9c2Qkt",
+  "tags": []
+}
