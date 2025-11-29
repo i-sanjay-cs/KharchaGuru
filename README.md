@@ -95,12 +95,3 @@ To run this project locally:
 4.  **Activate:** Turn on the workflow and start chatting with **Kharcha Guru**!
 
 ---
-
-## 📸 Screenshots & Demos
-
-*(Add more screenshots of the bot conversation here)*
-
----
-
-### License
-This project is licensed under the MIT License.
